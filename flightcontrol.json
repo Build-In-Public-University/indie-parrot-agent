@@ -1,0 +1,43 @@
+{
+  "environments": [
+    {
+      "id": "production",
+      "name": "Production",
+      "region": "us-east-2",
+      "source": {
+        "branch": "main"
+      },
+      "services": [
+        {
+          "id": "api",
+          "name": "API Server",
+          "type": "fargate",
+          "cpu": 0.5,
+          "memory": 1024,
+          "domain": "agent.theopenresearcher.com",
+          "minInstances": 1,
+          "maxInstances": 1,
+          "buildType": "nixpacks",
+          "env": {
+            "PORT": "8080",
+            "NODE_ENV": "production",
+            "DATABASE_URL": "${databases.main.connectionString}"
+          },
+          "healthCheck": {
+            "path": "/health"
+          }
+        }
+      ],
+      "databases": [
+        {
+          "id": "main",
+          "name": "Main Database",
+          "type": "postgresql",
+          "version": "15",
+          "size": "db.t3.micro",
+          "storage": 20
+        }
+      ]
+    }
+  ]
+} 
