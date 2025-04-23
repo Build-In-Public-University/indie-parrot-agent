@@ -16,13 +16,7 @@
                     "target": {
                         "type": "fargate"
                     },
-                    "buildType": {
-                        "provider": "nixpacks",
-                        "settings": {
-                            "nodeVersion": "20",
-                            "buildImage": "node:20"
-                        }
-                    },
+                    "buildType": "nixpacks",
                     "ci": {
                         "type": "ec2"
                     },
