@@ -25,7 +25,7 @@
                     "minInstances": 1,
                     "maxInstances": 1,
                     "port": 4111,
-                    "buildCommand": "npm ci && npx mastra build && npm run build",
+                    "buildCommand": "rm -rf node_modules/.cache && npm ci && npx mastra build && npm run build",
                     "startCommand": "node .mastra/output/index.mjs",
                     "envVariables": {
                         "DATABASE_URL": {
@@ -35,8 +35,7 @@
                             }
                         },
                         "NODE_ENV": "production"
-                    },
-                    "healthCheckPath": "/health"
+                    }
                 },
                 {
                     "id": "db",
