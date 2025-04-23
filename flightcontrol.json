@@ -1,43 +1,52 @@
 {
-  "environments": [
-    {
-      "id": "production",
-      "name": "Production",
-      "region": "us-east-2",
-      "source": {
-        "branch": "main"
-      },
-      "services": [
+    "$schema": "https://app.flightcontrol.dev/schema.json",
+    "environments": [
         {
-          "id": "api",
-          "name": "API Server",
-          "type": "fargate",
-          "cpu": 0.5,
-          "memory": 1024,
-          "domain": "agent.theopenresearcher.com",
-          "minInstances": 1,
-          "maxInstances": 1,
-          "buildType": "nixpacks",
-          "env": {
-            "PORT": "8080",
-            "NODE_ENV": "production",
-            "DATABASE_URL": "${databases.main.connectionString}"
-          },
-          "healthCheck": {
-            "path": "/health"
-          }
+            "id": "production",
+            "name": "Production",
+            "region": "us-east-2",
+            "source": {
+                "branch": "main"
+            },
+            "services": [
+                {
+                    "id": "agent",
+                    "name": "API Server",
+                    "type": "web",
+                    "target": {
+                        "type": "fargate"
+                    },
+                    "buildType": "nixpacks",
+                    "ci": {
+                        "type": "ec2"
+                    },
+                    "cpu": 0.5,
+                    "memory": 1024,
+                    "minInstances": 1,
+                    "maxInstances": 1,
+                    "port": 4111,
+                    "buildCommand": "npm run build",
+                    "startCommand": "node .mastra/output/index.mjs",
+                    "envVariables": {
+                        "DATABASE_URL": {
+                            "fromService": {
+                                "id": "db",
+                                "value": "dbConnectionString"
+                            }
+                        },
+                        "NODE_ENV": "production"
+                    },
+                    "healthCheckPath": "/health"
+                },
+                {
+                    "id": "db",
+                    "type": "rds",
+                    "engine": "postgres",
+                    "engineVersion": "15",
+                    "instanceSize": "db.t3.micro",
+                    "storage": 20
+                }
+            ]
         }
-      ],
-      "databases": [
-        {
-          "id": "main",
-          "name": "Main Database",
-          "type": "postgresql",
-          "version": "15",
-          "size": "db.t3.micro",
-          "storage": 20
-        }
-      ]
-    }
-  ]
-} 
+    ]
+}
