@@ -2,8 +2,8 @@
     "$schema": "https://app.flightcontrol.dev/schema.json",
     "environments": [
         {
-            "id": "production",
-            "name": "Production",
+            "id": "alpha",
+            "name": "Alpha",
             "region": "us-east-2",
             "source": {
                 "branch": "main"
