@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "mastra dev",
-    "build": "mastra build"
+    "build": "mastra build",
+    "postbuild": "mkdir -p .mastra/output/node_modules/pdfjs-dist/build && cp node_modules/pdfjs-dist/build/pdf.worker.mjs .mastra/output/node_modules/pdfjs-dist/build/"
   },
   "keywords": [],
   "author": "",
@@ -17,12 +18,24 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.3.17",
+    "@aws-sdk/client-s3": "^3.802.0",
+    "@mastra/chroma": "^0.2.11",
     "@mastra/core": "^0.9.1-alpha.0",
+    "@mastra/rag": "^0.1.19",
+    "@types/pdfjs-dist": "^2.10.378",
+    "chromadb": "^2.3.0",
+    "chromadb-default-embed": "^2.14.0",
+    "node-fetch": "^3.3.2",
+    "openai": "^4.97.0",
+    "pdfjs-dist": "^4.0.379",
+    "sharp": "^0.34.1",
     "zod": "^3.24.3"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",
     "mastra": "^0.5.0-alpha.9",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
-  }
+  },
+  "packageManager": "pnpm@8.15.9+sha512.499434c9d8fdd1a2794ebf4552b3b25c0a633abcee5bb15e7b5de90f32f47b513aca98cd5cfd001c31f0db454bc3804edccd578501e4ca293a6816166bbd9f81"
 }
