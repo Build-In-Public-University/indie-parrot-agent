@@ -298,19 +298,6 @@ export const pdfIngestTool = createTool({
     });
       
 
-    // const store = new ChromaVector({ path: "https://api.trychroma.com:8000",
-    //   //@ts-ignore
-    //   auth: { provider: "token", credentials: 'ck-6D2ZEai3Ec5FUhppoEtzWJnuBYLL2cvfxxtbLEjy6TSN', tokenHeaderType: "X_CHROMA_TOKEN" },
-    //   tenant: '44bcbb14-87f0-4601-9e2f-3bf64104d7c4',
-    //   database: 'theopenresearcher'
-    // });
-    
-    // // Create index for text chunks
-    // await store.createIndex({
-    //   indexName: "text_chunks",
-    //   dimension: 1536,
-    // });
-
     // Upsert text chunks in batches of 10
     const batchSize = 10;
     const generatedIds = chunks.map(() => crypto.randomUUID());
