@@ -1,6 +1,6 @@
 import { openai } from '@ai-sdk/openai';
 import { Agent } from '@mastra/core/agent';
-import { pdfIngestTool } from '../tools/pdf-ingest';
+import { audioIngestTool } from '../tools/audio-ingest';
 
 export const researcherAgent = new Agent({
   name: 'researcher',
@@ -10,5 +10,5 @@ export const researcherAgent = new Agent({
 
 `,
   model: openai('gpt-4o'),
-  tools: {  pdfIngestTool },
+  tools: { audioIngestTool },
 });
