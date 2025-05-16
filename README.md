@@ -26,6 +26,11 @@ The system processes audio files from S3 buckets and generates branded newslette
    - Follows brand guidelines and tone
    - Produces final newsletter content
 
+5. **Create Beehiiv Post** (`createBeehiivPost`)
+   - Publishes the newsletter content to Beehiiv
+   - Supports scheduling and thumbnail images
+   - Returns the created post ID
+
 ## Configuration
 
 ### Environment Variables
@@ -34,6 +39,7 @@ INDIEPARROT_AWS_REGION=us-east-2
 INDIEPARROT_AWS_ACCESS_KEY_ID=your_access_key
 INDIEPARROT_AWS_SECRET_ACCESS_KEY=your_secret_key
 INDIEPARROT_AWS_BUCKET=your_bucket_name
+BEEHIIV_API_KEY=your_beehiiv_api_key
 ```
 
 ### Client Configuration
@@ -42,7 +48,8 @@ Clients are configured in the `CLIENTS` array:
 {
   name: 'IndieParrot',
   website: 'https://indieparrot.com',
-  bucket: 'indieparrot'
+  bucket: 'indieparrot',
+  beehiivPublicationId: 'pub_00000000-0000-0000-0000-000000000000'
 }
 ```
 
@@ -68,6 +75,13 @@ const result = await newsletterWorkflow.execute({
 });
 ```
 
+The workflow will:
+1. Process the audio file
+2. Generate a transcription
+3. Create brand analysis
+4. Generate newsletter content
+5. Publish to Beehiiv
+
 ## Error Handling
 
 The workflow includes error handling for:
@@ -75,6 +89,7 @@ The workflow includes error handling for:
 - Invalid S3 paths
 - Missing transcriptions
 - Failed brand analysis generation
+- Beehiiv API errors
 
 ## Dependencies
 

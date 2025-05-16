@@ -157,6 +157,59 @@ const ensureBrandAnalysis = createStep({
 
 const createBrandAnalysis = createStep(brandAnalyzerTool)
 const createTranscription = createStep(audioIngestTool)
+
+const createBeehiivPost = createStep({
+  id: 'create-beehiiv-post',
+  description: 'Creates a post on Beehiiv using the newsletter content',
+  inputSchema: z.object({
+    content: z.string(),
+    title: z.string(),
+    subtitle: z.string().optional(),
+    publicationId: z.string(),
+    thumbnailImageUrl: z.string().optional(),
+    scheduledAt: z.string().optional(),
+  }),
+  outputSchema: z.object({
+    postId: z.string()
+  }),
+  execute: async ({ inputData, mastra }: StepContext) => {
+    const { content, title, subtitle, publicationId, thumbnailImageUrl, scheduledAt } = inputData;
+
+    const response = await fetch(`https://api.beehiiv.com/v2/publications/${publicationId}/posts`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.BEEHIIV_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        title,
+        subtitle,
+        blocks: [
+          {
+            type: 'paragraph',
+            plaintext: content
+          }
+        ],
+        thumbnail_image_url: thumbnailImageUrl,
+        scheduled_at: scheduledAt,
+        web_settings: {
+          display_thumbnail_on_web: true,
+          hide_from_feed: false
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to create Beehiiv post: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return {
+      postId: data.data.id
+    };
+  }
+});
+
 export const newsletterWorkflow = createWorkflow({
   id: 'newsletter-workflow',
   inputSchema: z.object({
@@ -164,12 +217,12 @@ export const newsletterWorkflow = createWorkflow({
   }),
   outputSchema: z.object({
     newsletterId: z.string(),
-    content: z.string()
+    content: z.string(),
+    postId: z.string()
   })
 })
   .then(listS3Files)
   .then(createTranscription)
-  // .then(archiveAudioFile)
   .then(createBrandAnalysis)
   .map({
     brandAnalysisId: {
@@ -182,4 +235,15 @@ export const newsletterWorkflow = createWorkflow({
     }
   })  
   .then(createStep(newsletterWriterTool))
+  .map({
+    content: {
+      step: newsletterWriterTool,
+      path: "content"
+    },
+    title: {
+      step: newsletterWriterTool,
+      path: "title"
+    }
+  })
+  .then(createBeehiivPost)
   .commit();

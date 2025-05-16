@@ -24,6 +24,10 @@ const newsletterAgent = new Agent({
 export const mastra = new Mastra({
   vnext_workflows: { "newsletter-workflow": newsletterWorkflow },
   agents: { newsletterAgent },
+  server: {
+    host: "0.0.0.0",
+    port: 4111
+  },
   logger: createLogger({
     name: 'Mastra',
     level: 'info',
