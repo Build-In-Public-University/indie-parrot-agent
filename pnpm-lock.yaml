@@ -15,8 +15,8 @@ dependencies:
     specifier: ^0.2.11
     version: 0.2.11(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3)
   '@mastra/core':
-    specifier: ^0.9.1-alpha.0
-    version: 0.9.1-alpha.4(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3)
+    specifier: ^0.9.4
+    version: 0.9.4(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3)
   '@mastra/rag':
     specifier: ^0.1.19
     version: 0.1.19(ai@4.3.10)(openapi-types@12.1.3)(react@19.1.0)(tree-sitter@0.22.4)(web-tree-sitter@0.24.7)
@@ -65,11 +65,14 @@ devDependencies:
     specifier: ^22.14.1
     version: 22.15.3
   mastra:
-    specifier: ^0.5.0-alpha.9
-    version: 0.5.0(@opentelemetry/api@1.9.0)(openapi-types@12.1.3)(react@19.1.0)(typescript@5.8.3)
+    specifier: ^0.6.3
+    version: 0.6.3(@opentelemetry/api@1.9.0)(openapi-types@12.1.3)(react@19.1.0)(typescript@5.8.3)
   ts-node:
     specifier: ^10.9.2
     version: 10.9.2(@types/node@22.15.3)(typescript@5.8.3)
+  tsx:
+    specifier: ^4.19.4
+    version: 4.19.4
   typescript:
     specifier: ^5.8.3
     version: 5.8.3
@@ -2015,7 +2018,7 @@ packages:
   /@mastra/chroma@0.2.11(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3):
     resolution: {integrity: sha512-OVqgly2xx/rCGdO9m7U16WhUK6AsrzjfA8EXL+GFxzCIDJsDh5IGU0utKnTSPVSaMj3PMkwvqZnisINckwpNGQ==}
     dependencies:
-      '@mastra/core': 0.9.0(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3)
+      '@mastra/core': 0.9.4(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3)
       chromadb: 2.3.0(zod@3.24.3)
     transitivePeerDependencies:
       - '@hono/arktype-validator'
@@ -2041,11 +2044,11 @@ packages:
       - zod-openapi
     dev: false
 
-  /@mastra/core@0.9.0(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3):
-    resolution: {integrity: sha512-2cOwnZFlS5JoIuFkn334qjffzx8xBP1lP4rpoH9N1SpyllwW7P9iaFjrWuVpX/IX29FbhJHX1l2g/0FO+pL+BA==}
+  /@mastra/core@0.9.4(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3):
+    resolution: {integrity: sha512-vkoc2Dgmfo0wwX6DZcc2nUnMmENoW3kSuNYJrDfQzfmS36vR7jBjtv+Y9zdpk9TcHIRCHVHcNub7DG1tnZ40fQ==}
     engines: {node: '>=20'}
     peerDependencies:
-      zod: ^3.24.0
+      zod: ^3.0.0
     dependencies:
       '@libsql/client': 0.14.0
       '@opentelemetry/api': 1.9.0
@@ -2076,6 +2079,8 @@ packages:
       sift: 17.1.3
       xstate: 5.19.2
       zod: 3.24.3
+      zod-from-json-schema: 0.0.5
+      zod-to-json-schema: 3.24.5(zod@3.24.3)
     transitivePeerDependencies:
       - '@hono/arktype-validator'
       - '@hono/effect-validator'
@@ -2096,69 +2101,13 @@ packages:
       - valibot
       - zod-openapi
 
-  /@mastra/core@0.9.1-alpha.4(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3):
-    resolution: {integrity: sha512-DhNn8oOm2aVzEp5S/uJhAf+jJjr2mUgdKk6pIpVgzZPD4LPiYAZ7Te+L+OU3c7swObik6tNLmq9o/pJOgWVqPg==}
-    engines: {node: '>=20'}
-    peerDependencies:
-      zod: ^3.24.0
-    dependencies:
-      '@libsql/client': 0.14.0
-      '@opentelemetry/api': 1.9.0
-      '@opentelemetry/auto-instrumentations-node': 0.56.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/core': 1.30.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/exporter-trace-otlp-grpc': 0.57.2(@opentelemetry/api@1.9.0)
-      '@opentelemetry/exporter-trace-otlp-http': 0.57.2(@opentelemetry/api@1.9.0)
-      '@opentelemetry/otlp-exporter-base': 0.57.2(@opentelemetry/api@1.9.0)
-      '@opentelemetry/otlp-transformer': 0.57.2(@opentelemetry/api@1.9.0)
-      '@opentelemetry/resources': 1.30.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/sdk-metrics': 1.30.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/sdk-node': 0.57.2(@opentelemetry/api@1.9.0)
-      '@opentelemetry/sdk-trace-base': 1.30.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/sdk-trace-node': 1.30.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/semantic-conventions': 1.32.0
-      ai: 4.3.10(react@19.1.0)(zod@3.24.3)
-      cohere-ai: 7.17.1
-      date-fns: 3.6.0
-      dotenv: 16.5.0
-      fastembed: 1.14.4
-      hono: 4.7.8
-      hono-openapi: 0.4.7(hono@4.7.8)(openapi-types@12.1.3)(zod@3.24.3)
-      json-schema: 0.4.0
-      json-schema-to-zod: 2.6.1
-      pino: 9.6.0
-      pino-pretty: 13.0.0
-      radash: 12.1.0
-      sift: 17.1.3
-      xstate: 5.19.2
-      zod: 3.24.3
-    transitivePeerDependencies:
-      - '@hono/arktype-validator'
-      - '@hono/effect-validator'
-      - '@hono/typebox-validator'
-      - '@hono/valibot-validator'
-      - '@hono/zod-validator'
-      - '@sinclair/typebox'
-      - '@valibot/to-json-schema'
-      - arktype
-      - aws-crt
-      - bufferutil
-      - effect
-      - encoding
-      - openapi-types
-      - react
-      - supports-color
-      - utf-8-validate
-      - valibot
-      - zod-openapi
-    dev: false
-
-  /@mastra/deployer@0.3.0(openapi-types@12.1.3)(react@19.1.0)(typescript@5.8.3):
-    resolution: {integrity: sha512-WQzaylHX1yeauGqo0oIjWR0CutoDAV1Itmjy4Srpcsxpi/i9R36tCUyZvmHZcGN9BZpt+OQRxbAIzttpbdtNPw==}
+  /@mastra/deployer@0.3.4(openapi-types@12.1.3)(react@19.1.0)(typescript@5.8.3):
+    resolution: {integrity: sha512-fV40Hsz3UqwCcyGRkfvQvdrQZVTWVrUvGfmQ20u2UTXpYMLSmc7sOJX6OG4ces++SvH4Q+c5XfM2oSNtoDKgGQ==}
     dependencies:
       '@babel/core': 7.26.10
       '@babel/helper-module-imports': 7.25.9
-      '@mastra/core': 0.9.0(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3)
-      '@mastra/server': 2.0.0(@mastra/core@0.9.0)
+      '@mastra/core': 0.9.4(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3)
+      '@mastra/server': 2.0.4(@mastra/core@0.9.4)(zod@3.24.3)
       '@neon-rs/load': 0.1.82
       '@rollup/plugin-alias': 5.1.1(rollup@4.40.1)
       '@rollup/plugin-commonjs': 28.0.3(rollup@4.40.1)
@@ -2206,7 +2155,7 @@ packages:
     peerDependencies:
       ai: ^4.0.0
     dependencies:
-      '@mastra/core': 0.9.0(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3)
+      '@mastra/core': 0.9.4(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3)
       '@paralleldrive/cuid2': 2.2.2
       ai: 4.3.10(react@19.1.0)(zod@3.24.3)
       js-tiktoken: 1.0.20
@@ -2240,12 +2189,14 @@ packages:
       - zod-openapi
     dev: false
 
-  /@mastra/server@2.0.0(@mastra/core@0.9.0):
-    resolution: {integrity: sha512-UrjkP7CngqIdzHpzOyZHzSmB9qJL6dzeC4cUgr3pEDdbGsa5CCn68sEHKdpzoSfRTsaTmLI6ZjaDbmmbcqna3g==}
+  /@mastra/server@2.0.4(@mastra/core@0.9.4)(zod@3.24.3):
+    resolution: {integrity: sha512-HabEd5MjFhc32UhsOeNMvA9PcqtcM5u2VJhcfjc3vsIkkVObqOP5xIW4iSpldddR7eK3a69sf4flacPSzFC8sw==}
     peerDependencies:
-      '@mastra/core': ^0.9.0
+      '@mastra/core': ^0.9.4
+      zod: ^3.0.0
     dependencies:
-      '@mastra/core': 0.9.0(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3)
+      '@mastra/core': 0.9.4(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3)
+      zod: 3.24.3
     dev: true
 
   /@mongodb-js/saslprep@1.2.2:
@@ -5936,14 +5887,14 @@ packages:
     resolution: {integrity: sha512-s8UhlNe7vPKomQhC1qFelMokr/Sc3AgNbso3n74mVPA5LTZwkB9NlXf4XPamLxJE8h0gh73rM94xvwRT2CVInw==}
     dev: true
 
-  /mastra@0.5.0(@opentelemetry/api@1.9.0)(openapi-types@12.1.3)(react@19.1.0)(typescript@5.8.3):
-    resolution: {integrity: sha512-tF7wyc5blMjc68a959fstctJddN3E+QwULWipAuWUM0NXu989307guBtKSXNIR//G74iDnhs2klDln6GBFJCUg==}
+  /mastra@0.6.3(@opentelemetry/api@1.9.0)(openapi-types@12.1.3)(react@19.1.0)(typescript@5.8.3):
+    resolution: {integrity: sha512-sAPsaZXwweB2PVz7d3KzHtVMFLeffFSJpELNWHyYSlHvXSsy2h1FEakmaa/ooiwIUFoNvc50sUgRSgpGoVTtvA==}
     hasBin: true
     dependencies:
       '@clack/prompts': 0.8.2
       '@lukeed/uuid': 2.0.1
-      '@mastra/core': 0.9.0(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3)
-      '@mastra/deployer': 0.3.0(openapi-types@12.1.3)(react@19.1.0)(typescript@5.8.3)
+      '@mastra/core': 0.9.4(openapi-types@12.1.3)(react@19.1.0)(zod@3.24.3)
+      '@mastra/deployer': 0.3.4(openapi-types@12.1.3)(react@19.1.0)(typescript@5.8.3)
       '@opentelemetry/instrumentation': 0.57.2(@opentelemetry/api@1.9.0)
       '@webcontainer/env': 1.1.1
       commander: 12.1.0
@@ -5952,10 +5903,11 @@ packages:
       fs-extra: 11.3.0
       json-schema-to-zod: 2.6.1
       picocolors: 1.1.1
-      posthog-node: 4.14.0
+      posthog-node: 4.16.0
       prettier: 3.5.3
       prompt: 1.3.0
       shiki: 1.29.2
+      strip-json-comments: 5.0.1
       superjson: 2.2.2
       swr: 2.3.3(react@19.1.0)
       tcp-port-used: 1.0.2
@@ -6554,8 +6506,8 @@ packages:
     dependencies:
       xtend: 4.0.2
 
-  /posthog-node@4.14.0:
-    resolution: {integrity: sha512-PitSiuxGiVFl0ItuhIfi3Sq1tcaMU4vlbPu1wv0qufTJGDjWthOOr4vYfFIs1xkbJFOQcfGczMXkr44kX5TDDg==}
+  /posthog-node@4.16.0:
+    resolution: {integrity: sha512-j7t3h8gC2A2GUE8inqshaUuSrP7zLLtwHpP6sv9vePNRhjEqqd7lPzyjEeDWdcW1COmHtQXH19TYbyjGlutNXA==}
     engines: {node: '>=15.0.0'}
     dependencies:
       axios: 1.9.0
@@ -7130,6 +7082,11 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
 
+  /strip-json-comments@5.0.1:
+    resolution: {integrity: sha512-0fk9zBqO67Nq5M/m45qHCJxylV/DhBlIOVExqgOMiCCrzrhU6tCibRXNqE3jwJLftzE9SNuZtYbpzcO+i9FiKw==}
+    engines: {node: '>=14.16'}
+    dev: true
+
   /strnum@1.1.2:
     resolution: {integrity: sha512-vrN+B7DBIoTTZjnPNewwhx6cBA/H+IS7rfW68n7XxC1y7uoiGQBxaKzqucGUgavX15dJgiGztLJ8vxuEzwqBdA==}
 
@@ -7304,6 +7261,17 @@ packages:
 
   /tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
+  /tsx@4.19.4:
+    resolution: {integrity: sha512-gK5GVzDkJK1SI1zwHf32Mqxf2tSJkNx+eYcNly5+nHvWqXUJYUkWBQtKauoESz3ymezAI++ZwT855x5p5eop+Q==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+    dependencies:
+      esbuild: 0.25.3
+      get-tsconfig: 4.10.0
+    optionalDependencies:
+      fsevents: 2.3.3
+    dev: true
 
   /tunnel-agent@0.6.0:
     resolution: {integrity: sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w==}
@@ -7615,6 +7583,11 @@ packages:
     resolution: {integrity: sha512-GQHQqAopRhwU8Kt1DDM8NjibDXHC8eoh1erhGAJPEyveY9qqVeXvVikNKrDz69sHowPMorbPUrH/mx8c50eiBQ==}
     engines: {node: '>=18'}
     dev: true
+
+  /zod-from-json-schema@0.0.5:
+    resolution: {integrity: sha512-zYEoo86M1qpA1Pq6329oSyHLS785z/mTwfr9V1Xf/ZLhuuBGaMlDGu/pDVGVUe4H4oa1EFgWZT53DP0U3oT9CQ==}
+    dependencies:
+      zod: 3.24.3
 
   /zod-to-json-schema@3.24.5(zod@3.24.3):
     resolution: {integrity: sha512-/AuWwMP+YqiPbsJx5D6TfgRTc4kTLjsh5SOcd4bLsfUg2RcEXrFMJl1DGgdHy2aCfsIA/cr/1JM0xcB2GZji8g==}

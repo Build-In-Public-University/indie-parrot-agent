@@ -1,4 +1,4 @@
-import { createTool } from "@mastra/core/tools";
+import { createTool } from '@mastra/core';
 import { z } from "zod";
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
@@ -77,10 +77,22 @@ export const audioIngestTool = createTool({
     success: z.boolean(),
     transcriptionId: z.string(),
     status: z.string(),
+    s3Path: z.string()
   }),
-  execute: async ({ context }) => {
+  execute: async ({ context }: { context: { s3Path: string } }) => {
+    console.log('audio-ingest', context);
     const { s3Path } = context;
-    
+
+    // Does a transcript already exist for this s3Path
+    const existingTranscription = await Transcription.findOne({ s3Path });
+    if (existingTranscription) {
+      return {
+        success: true,
+        transcriptionId: existingTranscription.transcriptionId,
+        status: existingTranscription.status,
+        s3Path: existingTranscription.s3Path
+      }
+    }
     // Parse bucket and key from s3Path
     let bucket, key;
     if (s3Path.startsWith('s3://')) {
@@ -89,7 +101,7 @@ export const audioIngestTool = createTool({
       bucket = match[1];
       key = match[2];
     } else {
-      bucket = process.env.INDIEPARROT_BUCKET;
+      bucket = process.env.INDIEPARROT_S3_BUCKET_NAME;
       key = s3Path;
     }
     
@@ -163,7 +175,8 @@ export const audioIngestTool = createTool({
     return {
       success: true,
       transcriptionId,
-      status: transcription.status
+      status: transcription.status,
+      s3Path: transcription.s3Path
     };
   },
 }); 

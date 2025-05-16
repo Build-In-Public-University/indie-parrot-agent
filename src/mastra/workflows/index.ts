@@ -1,185 +1,185 @@
 import { openai } from '@ai-sdk/openai';
-import { Agent } from '@mastra/core/agent';
-import { Step, Workflow } from '@mastra/core/workflows';
-import { z } from 'zod';
+import { S3Client, ListObjectsV2Command, CopyObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { z } from "zod";
+import { createWorkflow, createStep } from "@mastra/core/workflows/vNext";
+import { audioIngestTool, brandAnalyzerTool, newsletterWriterTool } from '../tools';
+import { Transcription } from '../models/transcription';
+import { BrandAnalysis } from '../models/brand-analysis';
+// Define client configurations
+const CLIENTS = [
+  {
+    name: 'IndieParrot',
+    website: 'https://indieparrot.com',
+    bucket: 'indieparrot'
+  },
+  // Add more clients as needed
+];
 
 const llm = openai('gpt-4o');
 
-const agent = new Agent({
-  name: 'Weather Agent',
-  model: llm,
-  instructions: `
-        You are a local activities and travel expert who excels at weather-based planning. Analyze the weather data and provide practical activity recommendations.
-
-        For each day in the forecast, structure your response exactly as follows:
-
-        📅 [Day, Month Date, Year]
-        ═══════════════════════════
-
-        🌡️ WEATHER SUMMARY
-        • Conditions: [brief description]
-        • Temperature: [X°C/Y°F to A°C/B°F]
-        • Precipitation: [X% chance]
-
-        🌅 MORNING ACTIVITIES
-        Outdoor:
-        • [Activity Name] - [Brief description including specific location/route]
-          Best timing: [specific time range]
-          Note: [relevant weather consideration]
-
-        🌞 AFTERNOON ACTIVITIES
-        Outdoor:
-        • [Activity Name] - [Brief description including specific location/route]
-          Best timing: [specific time range]
-          Note: [relevant weather consideration]
-
-        🏠 INDOOR ALTERNATIVES
-        • [Activity Name] - [Brief description including specific venue]
-          Ideal for: [weather condition that would trigger this alternative]
-
-        ⚠️ SPECIAL CONSIDERATIONS
-        • [Any relevant weather warnings, UV index, wind conditions, etc.]
-
-        Guidelines:
-        - Suggest 2-3 time-specific outdoor activities per day
-        - Include 1-2 indoor backup options
-        - For precipitation >50%, lead with indoor activities
-        - All activities must be specific to the location
-        - Include specific venues, trails, or locations
-        - Consider activity intensity based on temperature
-        - Keep descriptions concise but informative
-
-        Maintain this exact formatting for consistency, using the emoji and section headers as shown.
-      `,
-});
-
-const forecastSchema = z.array(
-  z.object({
-    date: z.string(),
-    maxTemp: z.number(),
-    minTemp: z.number(),
-    precipitationChance: z.number(),
-    condition: z.string(),
-    location: z.string(),
-  }),
-);
-
-const fetchWeather = new Step({
-  id: 'fetch-weather',
-  description: 'Fetches weather forecast for a given city',
-  inputSchema: z.object({
-    city: z.string().describe('The city to get the weather for'),
-  }),
-  outputSchema: forecastSchema,
-  execute: async ({ context }) => {
-    const triggerData = context?.getStepResult<{ city: string }>('trigger');
-
-    if (!triggerData) {
-      throw new Error('Trigger data not found');
-    }
-
-    const geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(triggerData.city)}&count=1`;
-    const geocodingResponse = await fetch(geocodingUrl);
-    const geocodingData = (await geocodingResponse.json()) as {
-      results: { latitude: number; longitude: number; name: string }[];
-    };
-
-    if (!geocodingData.results?.[0]) {
-      throw new Error(`Location '${triggerData.city}' not found`);
-    }
-
-    const { latitude, longitude, name } = geocodingData.results[0];
-
-    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_mean,weathercode&timezone=auto`;
-    const response = await fetch(weatherUrl);
-    const data = (await response.json()) as {
-      daily: {
-        time: string[];
-        temperature_2m_max: number[];
-        temperature_2m_min: number[];
-        precipitation_probability_mean: number[];
-        weathercode: number[];
-      };
-    };
-
-    const forecast = data.daily.time.map((date: string, index: number) => ({
-      date,
-      maxTemp: data.daily.temperature_2m_max[index],
-      minTemp: data.daily.temperature_2m_min[index],
-      precipitationChance: data.daily.precipitation_probability_mean[index],
-      condition: getWeatherCondition(data.daily.weathercode[index]!),
-      location: name,
-    }));
-
-    return forecast;
-  },
-});
-
-const planActivities = new Step({
-  id: 'plan-activities',
-  description: 'Suggests activities based on weather conditions',
-  execute: async ({ context, mastra }) => {
-    const forecast = context?.getStepResult(fetchWeather);
-
-    if (!forecast || forecast.length === 0) {
-      throw new Error('Forecast data not found');
-    }
-
-    const prompt = `Based on the following weather forecast for ${forecast[0]?.location}, suggest appropriate activities:
-      ${JSON.stringify(forecast, null, 2)}
-      `;
-
-    const response = await agent.stream([
-      {
-        role: 'user',
-        content: prompt,
-      },
-    ]);
-
-    let activitiesText = '';
-
-    for await (const chunk of response.textStream) {
-      process.stdout.write(chunk);
-      activitiesText += chunk;
-    }
-
-    return {
-      activities: activitiesText,
-    };
-  },
-});
-
-function getWeatherCondition(code: number): string {
-  const conditions: Record<number, string> = {
-    0: 'Clear sky',
-    1: 'Mainly clear',
-    2: 'Partly cloudy',
-    3: 'Overcast',
-    45: 'Foggy',
-    48: 'Depositing rime fog',
-    51: 'Light drizzle',
-    53: 'Moderate drizzle',
-    55: 'Dense drizzle',
-    61: 'Slight rain',
-    63: 'Moderate rain',
-    65: 'Heavy rain',
-    71: 'Slight snow fall',
-    73: 'Moderate snow fall',
-    75: 'Heavy snow fall',
-    95: 'Thunderstorm',
-  };
-  return conditions[code] || 'Unknown';
+interface StepContext {
+  inputData: any;
+  mastra: any;
 }
 
-const weatherWorkflow = new Workflow({
-  name: 'weather-workflow',
-  triggerSchema: z.object({
-    city: z.string().describe('The city to get the weather for'),
+const listS3Files = createStep({
+  id: 'list-s3-files',
+  description: 'Lists audio files in the source S3 bucket that need processing',
+  inputSchema: z.object({
+    clientName: z.string().describe('Name of the client to process files for'),
   }),
+  outputSchema: z.object({
+    key: z.string()    
+  }),
+  execute: async ({ inputData, mastra }: StepContext) => {
+    const { clientName } = inputData;
+    const client = CLIENTS.find(c => c.name === clientName);
+    
+    if (!client) {
+      throw new Error(`Client ${clientName} not found`);
+    }
+
+    const s3 = new S3Client({
+      region: process.env.INDIEPARROT_AWS_REGION || 'us-east-2',
+      credentials: {
+        accessKeyId: process.env.INDIEPARROT_AWS_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.INDIEPARROT_AWS_SECRET_ACCESS_KEY || '',
+      }
+    });
+
+    const command = new ListObjectsV2Command({
+      Bucket: client.bucket,
+      Prefix: `inbound/${clientName}/`
+    });
+
+    const response = await s3.send(command);
+    console.log('response', response);
+    // get first file from response
+    const file = response?.Contents?.[0];
+    if (!file) {
+      throw new Error(`No files found for client ${clientName}`);
+    }
+    return {
+      s3Path: file.Key!
+    }
+  }
+});
+
+
+
+const archiveAudioFile = createStep({
+  id: 'archive-audio-file',
+  description: 'Archives audio file',
+  inputSchema: z.object({
+    s3Path: z.string()
+  }),
+  execute: async ({ inputData, mastra }: StepContext) => {
+    const { s3Path } = inputData;
+    
+    // Move file to archive
+    const s3 = new S3Client({
+      region: process.env.INDIEPARROT_AWS_REGION || 'us-east-2',
+      credentials: {
+        accessKeyId: process.env.INDIEPARROT_AWS_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.INDIEPARROT_AWS_SECRET_ACCESS_KEY || '',
+      }
+    });
+
+    // Copy to archive
+    await s3.send(new CopyObjectCommand({
+      Bucket: process.env.INDIEPARROT_AWS_BUCKET || '',
+      CopySource: `${process.env.INDIEPARROT_AWS_BUCKET || ''}/${s3Path}`,
+      Key: s3Path.replace('inbound', 'archived')
+    }));
+
+    // Delete from source
+    await s3.send(new DeleteObjectCommand({
+      Bucket: process.env.INDIEPARROT_AWS_BUCKET || '',
+      Key: s3Path
+    }));
+
+    return {
+      status: 'success'
+    };
+  }
 })
-  .step(fetchWeather)
-  .then(planActivities);
 
-weatherWorkflow.commit();
+c
 
-export { weatherWorkflow };
+const ensureBrandAnalysis = createStep({
+  id: 'ensure-brand-analysis',
+  description: 'Ensures brand analysis exists for client',
+  inputSchema: z.object({
+    transcriptionId: z.string()
+  }),
+  outputSchema: z.object({
+    brandAnalysisId: z.string()
+  }),
+  execute: async ({ inputData, mastra }: StepContext) => {
+    const { transcriptionId } = inputData;
+
+    // get Transcription from MongoDB
+    const transcription = await Transcription.findOne({ transcriptionId });
+    if (!transcription) {
+      throw new Error(`Transcription ${transcriptionId} not found`);
+    }
+
+    // get s3 path from transcription
+    const s3Path = transcription.s3Path;
+    const clientName = s3Path.split('/')[1];
+
+    // get client from s3 path
+    const client = CLIENTS.find(c => c.name === clientName);
+    if (!client) {
+      throw new Error(`Client not found for s3 path ${s3Path}`);
+    }
+
+    // get brand analysis from MongoDB
+    const brandAnalysis = await BrandAnalysis.findOne({ website: client.website });
+    if (!brandAnalysis) {
+      return {
+        status: "missing",
+        transcriptionId,
+        website: client.website
+      }
+    }
+    console.log('brand-analysis', brandAnalysis);
+
+    return {
+      status: "found",
+      brandAnalysisId: brandAnalysis._id,
+      transcriptionId,
+      website: client.website
+    }
+  }
+});
+
+
+const createBrandAnalysis = createStep(brandAnalyzerTool)
+const createTranscription = createStep(audioIngestTool)
+export const newsletterWorkflow = createWorkflow({
+  id: 'newsletter-workflow',
+  inputSchema: z.object({
+    clientName: z.string().describe('Name of the client to process'),
+  }),
+  outputSchema: z.object({
+    newsletterId: z.string(),
+    content: z.string()
+  })
+})
+  .then(listS3Files)
+  .then(createTranscription)
+  // .then(archiveAudioFile)
+  .then(createBrandAnalysis)
+  .map({
+    brandAnalysisId: {
+      step: createBrandAnalysis,
+      path: "brandAnalysisId"
+    },
+    transcriptionId: {
+      step: createTranscription,
+      path: "transcriptionId"
+    }
+  })  
+  .then(createStep(newsletterWriterTool))
+  .commit();

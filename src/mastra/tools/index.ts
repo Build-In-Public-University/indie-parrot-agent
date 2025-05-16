@@ -1,4 +1,4 @@
-import { createTool } from '@mastra/core/tools';
+import { createTool } from '@mastra/core';
 import { z } from 'zod';
 
 interface GeocodingResponse {
@@ -100,3 +100,8 @@ function getWeatherCondition(code: number): string {
   };
   return conditions[code] || 'Unknown';
 }
+
+export { audioIngestTool } from './audio-transcription';
+export { brandAnalyzerTool } from './brand-analyzer';
+export { newsletterWriterTool } from './newsletter-writer';
+export { workflowRunnerTool } from './workflow-runner';

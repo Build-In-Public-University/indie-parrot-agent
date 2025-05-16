@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "mastra dev",
     "build": "mastra build",
-    "postbuild": "mkdir -p .mastra/output/node_modules/pdfjs-dist/build && cp node_modules/pdfjs-dist/build/pdf.worker.mjs .mastra/output/node_modules/pdfjs-dist/build/"
+    "postbuild": "mkdir -p .mastra/output/node_modules/pdfjs-dist/build && cp node_modules/pdfjs-dist/build/pdf.worker.mjs .mastra/output/node_modules/pdfjs-dist/build/",
+    "test:workflow": "node --loader ts-node/esm src/test-workflow.ts"
   },
   "keywords": [],
   "author": "",
@@ -14,13 +15,13 @@
   "description": "",
   "type": "module",
   "engines": {
-    "node": "20"
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.3.17",
     "@aws-sdk/client-s3": "^3.802.0",
     "@mastra/chroma": "^0.2.11",
-    "@mastra/core": "^0.9.1-alpha.0",
+    "@mastra/core": "^0.9.4",
     "@mastra/rag": "^0.1.19",
     "@types/cheerio": "^1.0.0",
     "@types/pdfjs-dist": "^2.10.378",
@@ -38,8 +39,9 @@
   },
   "devDependencies": {
     "@types/node": "^22.14.1",
-    "mastra": "^0.5.0-alpha.9",
+    "mastra": "^0.6.3",
     "ts-node": "^10.9.2",
+    "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   },
   "packageManager": "pnpm@8.15.9+sha512.499434c9d8fdd1a2794ebf4552b3b25c0a633abcee5bb15e7b5de90f32f47b513aca98cd5cfd001c31f0db454bc3804edccd578501e4ca293a6816166bbd9f81"

@@ -1,9 +1,18 @@
-import { createTool } from "@mastra/core/tools";
+import { createTool } from "@mastra/core";
 import { z } from "zod";
 import axios from 'axios';
 import mongoose from 'mongoose';
 import * as cheerio from 'cheerio';
 import { OpenAI } from 'openai';
+
+const CLIENTS = [
+  {
+    name: 'IndieParrot',
+    website: 'https://indieparrot.com',
+    bucket: 'indieparrot'
+  },
+  // Add more clients as needed
+];
 
 // MongoDB Schema
 const BrandAnalysisSchema = new mongoose.Schema({
@@ -75,18 +84,33 @@ export const brandAnalyzerTool = createTool({
   id: 'brand-analyzer',
   description: 'Analyze a website to extract brand voice, audience, values, mission, and goals',
   inputSchema: z.object({
-    website: z.string().url().describe('URL of the website to analyze'),
+    s3Path: z.string().url().describe('S3 path of the triggering input'),
   }),
   outputSchema: z.object({
-    success: z.boolean(),
-    brandVoice: z.string(),
-    audience: z.string(),
-    values: z.array(z.string()),
-    mission: z.string(),
-    goals: z.array(z.string()),
+    brandAnalysisId: z.string().describe('ID of the brand analysis'),
   }),
-  execute: async ({ context }) => {
-    const { website } = context;
+  execute: async ({ context }: { context: { s3Path: string } }) => {
+
+    console.log('brand-analyzer', context);
+    const { s3Path } = context;
+
+    // get client namconst s3Path = transcription.s3Path;
+    const clientName = s3Path.split('/')[1];
+
+    // get client from s3 path
+    const client = CLIENTS.find(c => c.name === clientName);
+    if (!client) {
+      throw new Error(`Client not found for s3 path ${s3Path}`);
+    }
+
+    const website = client.website; 
+    // Check if brand analysis already exists
+    const existingAnalysis = await BrandAnalysis.findOne({ website });
+    if (existingAnalysis) {
+      return {
+        brandAnalysisId: existingAnalysis._id.toString()
+      };
+    }
     
     // Create MongoDB document
     const analysis = new BrandAnalysis({
@@ -94,13 +118,13 @@ export const brandAnalyzerTool = createTool({
       status: 'pending'
     });
     await analysis.save();
-
+    console.log('brand-analyzer', analysis);
     try {
       // Scrape website content
       const content = await scrapeWebsite(website);
       analysis.rawContent = content;
       await analysis.save();
-
+      console.log('brand-analyzer', analysis);
       // Analyze content
       const brandInfo = await analyzeBrandContent(content);
 
@@ -115,8 +139,7 @@ export const brandAnalyzerTool = createTool({
       await analysis.save();
 
       return {
-        success: true,
-        ...brandInfo
+        brandAnalysisId: analysis._id
       };
     } catch (error) {
       analysis.status = 'failed';

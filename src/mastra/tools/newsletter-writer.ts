@@ -1,4 +1,4 @@
-import { createTool } from "@mastra/core/tools";
+import { createTool } from "@mastra/core";
 import { z } from "zod";
 import mongoose from 'mongoose';
 import { OpenAI } from 'openai';
@@ -17,7 +17,7 @@ const NewsletterSchema = new mongoose.Schema({
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/newsletters');
 
 const Newsletter = mongoose.model('Newsletter', NewsletterSchema);
-const Transcription = mongoose.model('Transcription', require('./audio-ingest').TranscriptionSchema);
+const Transcription = mongoose.model('Transcription', require('./audio-transcription').TranscriptionSchema);
 const BrandAnalysis = mongoose.model('BrandAnalysis', require('./brand-analyzer').BrandAnalysisSchema);
 
 async function generateNewsletter(transcript: string, brandInfo: any): Promise<string> {
@@ -54,7 +54,7 @@ Format the response as a JSON object with these fields:
 - conclusion: A wrap-up with call to action`;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: "gpt-4-turbo-preview",
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" }
   });
@@ -92,7 +92,8 @@ export const newsletterWriterTool = createTool({
     content: z.string(),
     status: z.string(),
   }),
-  execute: async ({ context }) => {
+  execute: async ({context}) => {
+    console.log('context', context);
     const { transcriptionId, brandAnalysisId } = context;
     
     // Create MongoDB document
@@ -105,7 +106,7 @@ export const newsletterWriterTool = createTool({
 
     try {
       // Get transcription and brand analysis data
-      const transcription = await Transcription.findById(transcriptionId);
+      const transcription = await Transcription.findOne({ transcriptionId });
       const brandAnalysis = await BrandAnalysis.findById(brandAnalysisId);
 
       if (!transcription || !brandAnalysis) {

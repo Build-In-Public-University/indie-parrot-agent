@@ -1,6 +1,7 @@
 import { openai } from '@ai-sdk/openai';
-import { Agent } from '@mastra/core/agent';
-import { brandAnalyzerTool } from '../tools/brand-analyzer';
+
+import { newsletterWriterTool } from '../tools/newsletter-writer';
+import { Agent } from '@mastra/core';
 
 export const researcherAgent = new Agent({
   name: 'researcher',
@@ -9,6 +10,6 @@ export const researcherAgent = new Agent({
     Use the brand analyzer tool to analyze websites and provide insights about their brand voice,
     audience, values, mission, and goals.
   `,
-  model: openai('gpt-4-turbo-preview'),
-  tools: { brandAnalyzerTool },
+  model: openai('gpt-4o'),
+  tools: {  newsletterWriterTool },
 });
