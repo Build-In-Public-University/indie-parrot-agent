@@ -54,7 +54,7 @@ Format the response as a JSON object with these fields:
 - conclusion: A wrap-up with call to action`;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4-turbo-preview",
+    model: "gpt-4o",
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" }
   });
