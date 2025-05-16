@@ -26,7 +26,7 @@
                     "maxInstances": 1,
                     "port": 4111,
                     "buildCommand": "npm run build",
-                    "startCommand": "node .mastra/output/index.mjs",
+                    "startCommand": "npm run dev",
                     "envVariables": {                        
                         "NODE_ENV": "production"
                     }
